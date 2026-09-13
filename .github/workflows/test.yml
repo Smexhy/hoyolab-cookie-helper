@@ -1,0 +1,36 @@
+name: Test
+
+on:
+  push:
+    paths:
+      - "get_cookie.py"
+      - "requirements.txt"
+      - "run-macos-linux.sh"
+      - "run-windows.bat"
+      - "tests/**"
+      - ".github/workflows/test.yml"
+  pull_request:
+    paths:
+      - "get_cookie.py"
+      - "requirements.txt"
+      - "run-macos-linux.sh"
+      - "run-windows.bat"
+      - "tests/**"
+      - ".github/workflows/test.yml"
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+      - if: runner.os == 'Windows'
+        shell: cmd
+        run: run-windows.bat --test
+      - if: runner.os != 'Windows'
+        run: sh run-macos-linux.sh --test
